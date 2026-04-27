@@ -118,7 +118,7 @@ http://localhost/STORE
 
 | Role  | Username | Password |
 |------|----------|----------|
-| Admin | admin    | admin123 |
+| Admin | admin    | admin |
 
 ---
 
