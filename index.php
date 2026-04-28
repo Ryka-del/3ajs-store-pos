@@ -43,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         <div class="flex flex-col md:w-1/2 w-full p-4 justify-center bg-blue-400 lg:bg-white">
             <img src="assets/images/login.png" alt="Store Image" class="w-40 h-40 ml-28 md:w-96 md:h-96 lg:mt-10 lg:ml-36 hidden md:block">
             <h2 class="ml-2 lg:ml-40 mt-4 text-white md:text-black text-start">Welcome to the</h2>
-            <h2 class="ml-2 lg:ml-40 text-white md:text-black text-start">Store Management System</h2>
+            <h2 class="ml-2 lg:ml-40 text-white md:text-black text-start">3AJS Store Manager</h2>
         </div>
         <!-- Right Section: Login Form -->
         <div class="md:w-1/2 w-full bg-gradient-to-r from-blue-500 to-purple-600 flex flex-col justify-center">
