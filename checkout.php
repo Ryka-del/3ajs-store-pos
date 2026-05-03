@@ -18,27 +18,45 @@ if (!$data || !isset($data['cart']) || empty($data['cart'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$total = $data['total'];
-$payment = $data['payment'];
-$paymentType = $data['paymentType'] ?? 'pay'; // ✅ default to "pay"
+$total = (float) $data['total'];
+$payment = (float) $data['payment'];
+$paymentType = ($data['paymentType'] ?? 'pay') === 'debt' ? 'debt' : 'pay';
 $cart = $data['cart'];
 
 $conn->begin_transaction();
 
 try {
-	// 1. Insert order
-	$paymentType = $data['paymentType'] ?? 'pay';
-	$stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, payment_amount, payment_type, created_at) 
-                        VALUES (?, ?, ?, ?, NOW())");
-	$stmt->bind_param("idds", $user_id, $total, $payment, $paymentType);
+	// Keep checkout compatible with databases imported before payment_type was added.
+	$paymentTypeColumn = $conn->query("SHOW COLUMNS FROM orders LIKE 'payment_type'");
+	$hasPaymentType = $paymentTypeColumn && $paymentTypeColumn->num_rows > 0;
+
+	if ($hasPaymentType) {
+		$stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, payment_amount, payment_type, created_at)
+			VALUES (?, ?, ?, ?, NOW())");
+		if (!$stmt) {
+			throw new Exception("Could not prepare order insert: " . $conn->error);
+		}
+		$stmt->bind_param("idds", $user_id, $total, $payment, $paymentType);
+	} else {
+		$stmt = $conn->prepare("INSERT INTO orders (user_id, total_amount, payment_amount, created_at)
+			VALUES (?, ?, ?, NOW())");
+		if (!$stmt) {
+			throw new Exception("Could not prepare order insert: " . $conn->error);
+		}
+		$stmt->bind_param("idd", $user_id, $total, $payment);
+	}
+
 	$stmt->execute();
 	$order_id = $stmt->insert_id;
 	$stmt->close();
 
-	// 2. For each item: check stock, insert order_item, decrement stock
 	$checkStmt = $conn->prepare("SELECT quantity, name FROM products WHERE id = ? FOR UPDATE");
 	$insertItem = $conn->prepare("INSERT INTO order_items (order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)");
 	$updateStock = $conn->prepare("UPDATE products SET quantity = quantity - ? WHERE id = ?");
+
+	if (!$checkStmt || !$insertItem || !$updateStock) {
+		throw new Exception("Could not prepare checkout statements: " . $conn->error);
+	}
 
 	foreach ($cart as $product_id => $item) {
 		$pid = (int) $product_id;
@@ -48,9 +66,11 @@ try {
 		$checkStmt->bind_param("i", $pid);
 		$checkStmt->execute();
 		$res = $checkStmt->get_result();
+
 		if (!$res || $res->num_rows === 0) {
 			throw new Exception("Product not found (ID $pid).");
 		}
+
 		$row = $res->fetch_assoc();
 		$currentQty = (int) $row['quantity'];
 		$pname = $row['name'];
@@ -58,6 +78,7 @@ try {
 		if ($qty <= 0) {
 			throw new Exception("Invalid quantity for $pname.");
 		}
+
 		if ($currentQty < $qty) {
 			throw new Exception("Insufficient stock for $pname. Available: $currentQty, requested: $qty.");
 		}
@@ -75,7 +96,6 @@ try {
 
 	$conn->commit();
 
-	// store last order id for UI display
 	$_SESSION['last_order_id'] = $order_id;
 
 	echo json_encode(["success" => true, "order_id" => $order_id]);
@@ -85,5 +105,4 @@ try {
 	echo json_encode(["success" => false, "message" => $e->getMessage()]);
 	exit;
 }
-
 ?>

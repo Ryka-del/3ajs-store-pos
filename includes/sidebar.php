@@ -8,12 +8,12 @@ if (session_status() === PHP_SESSION_NONE) {
 <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
 
 
-<div class="sticky top-0 h-screen w-52 bg-[#34495E] text-white  flex flex-col items-center py-6 hidden md:block z-50">
+<div class="ui-sidebar sticky top-0 h-screen w-52 text-white flex flex-col items-center py-6 hidden md:block z-50">
 
   <!-- User Avatar -->
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center reveal">
     <img src="https://api.dicebear.com/7.x/initials/svg?seed=<?php echo urlencode($_SESSION['fullname']); ?>"
-      alt="User Avatar" class="w-20 h-20 rounded-full border-2 border-gray-600 mb-2">
+      alt="User Avatar" class="ui-sidebar-avatar w-20 h-20 rounded-full border-2 border-gray-600 mb-2">
     <h2 class="max-lg:text-lg font-semibold min-md:text-xs"><?php echo htmlspecialchars($_SESSION['fullname']); ?></h2>
   </div>
 
@@ -27,25 +27,25 @@ if (session_status() === PHP_SESSION_NONE) {
 
     <!-- Navigation -->
     <nav id="" class="flex flex-col space-y-2 mt-2 w-full lg:block hidden">
-      <a href="home.php" class="flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
+      <a href="home.php" class="ui-nav-link reveal flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
         <i class='bx bx-home-alt text-5xl mb-1'></i>
         <span>Home</span>
       </a>
-      <a href="dashboard2.php" class="flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
+      <a href="dashboard2.php" class="ui-nav-link reveal flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
         <i class='bx bx-grid-column-left text-5xl mb-1'></i>
         <span>Dashboard</span>
       </a>
-      <a href="products.php" class="flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
+      <a href="products.php" class="ui-nav-link reveal flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
         <i class="bx bx-package text-5xl mb-1 "></i>
         <span>Products</span>
       </a>
-      <a href="transaction.php" class="flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
+      <a href="transaction.php" class="ui-nav-link reveal flex flex-col items-center p-3 rounded-lg hover:bg-[#2980B9]">
         <i class="bx bx-list-ul-square mb-1 text-5xl"></i>
         <span>Transactions</span>
       </a>
     </nav>
     <a href="logout.php"
-      class="flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 mt-4 rounded-lg space-x-2">
+      class="ui-nav-link reveal flex items-center justify-center bg-red-600 hover:bg-red-700 text-white px-4 py-2 mt-4 rounded-lg space-x-2">
       <i class='bx bx-log-out text-2xl'></i>
       <span>Logout</span>
     </a>

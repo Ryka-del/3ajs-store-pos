@@ -81,13 +81,49 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 });
 
+document.addEventListener("DOMContentLoaded", () => {
+    document.querySelectorAll(".reveal").forEach((el, index) => {
+        el.style.transitionDelay = `${Math.min(index * 45, 360)}ms`;
+    });
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("reveal-in");
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.12 });
+
+    document.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+});
+
+document.addEventListener("DOMContentLoaded", () => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    document.querySelectorAll(".tilt-card").forEach((card) => {
+        card.addEventListener("mousemove", (event) => {
+            const rect = card.getBoundingClientRect();
+            const px = (event.clientX - rect.left) / rect.width;
+            const py = (event.clientY - rect.top) / rect.height;
+            const rotateY = (px - 0.5) * 12;
+            const rotateX = (0.5 - py) * 12;
+            card.style.transform = `perspective(1200px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-6px)`;
+        });
+
+        card.addEventListener("mouseleave", () => {
+            card.style.transform = "";
+        });
+    });
+});
+
 
 // Highlight current page in navigation
 const currentPage = window.location.pathname.split("/").pop();
 document.querySelectorAll("nav a").forEach(link => {
     if (link.getAttribute("href") === currentPage) {
         link.classList.remove("text-gray-700", "hover:bg-gray-200");
-        link.classList.add("bg-blue-500", "text-white");
+        link.classList.add("bg-blue-500", "text-white", "is-active");
     }
 });
 
@@ -474,6 +510,16 @@ function payNow() {
 
     let total = computeCartTotal();
 
+    if (total <= 0 || !cart || Object.keys(cart).length === 0) {
+        Swal.fire({
+            icon: "info",
+            title: "Empty Cart",
+            text: "Please add an item before checkout.",
+            confirmButtonColor: "#3085d6"
+        });
+        return;
+    }
+
     // Validation only if paymentType = "pay"
     if (paymentType === "pay") {
         if (isNaN(paymentAmount) || paymentAmount < total) {
@@ -502,7 +548,14 @@ function payNow() {
             paymentType: paymentType
         })
     })
-        .then(res => res.json())
+        .then(async res => {
+            const text = await res.text();
+            try {
+                return JSON.parse(text);
+            } catch (error) {
+                throw new Error(text || "Checkout returned an invalid response.");
+            }
+        })
         .then(data => {
             if (data.success) {
                 Swal.fire({
@@ -529,7 +582,15 @@ function payNow() {
                 });
             }
         })
-        .catch(err => console.error("Checkout error:", err));
+        .catch(err => {
+            console.error("Checkout error:", err);
+            Swal.fire({
+                icon: "error",
+                title: "Checkout Failed",
+                text: err.message || "Something went wrong while processing payment.",
+                confirmButtonColor: "#d33"
+            });
+        });
 }
 
 // Load cart when page loads
@@ -551,29 +612,39 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // Page transition animations
-const page = document.getElementById("page-transition");
-
-// Slide + fade in
 window.addEventListener("DOMContentLoaded", () => {
+    const page = document.getElementById("page-transition");
+    if (!page) return;
+
     page.classList.remove("translate-y-5", "opacity-0");
     page.classList.add("translate-y-0", "opacity-100");
+
+    document.querySelectorAll("a").forEach(link => {
+        if (link.hostname === window.location.hostname) {
+            link.addEventListener("click", e => {
+                const href = link.getAttribute("href");
+                if (!href || href.startsWith("#") || href === "") return;
+
+                e.preventDefault();
+                page.classList.remove("translate-y-0", "opacity-100");
+                page.classList.add("translate-y-5", "opacity-0");
+                setTimeout(() => { window.location = href; }, 500);
+            });
+        }
+    });
 });
 
-// Slide + fade out
-document.querySelectorAll("a").forEach(link => {
-    if (link.hostname === window.location.hostname) {
-        link.addEventListener("click", e => {
-            e.preventDefault();
-            const href = link.getAttribute("href");
-            page.classList.remove("translate-y-0", "opacity-100");
-            page.classList.add("translate-y-5", "opacity-0");
-            setTimeout(() => { window.location = href; }, 500);
-        });
+window.addEventListener("pageshow", () => {
+    const page = document.getElementById("page-transition");
+    if (page) {
+        page.classList.remove("translate-y-5", "opacity-0");
+        page.classList.add("translate-y-0", "opacity-100");
     }
 });
 
 window.addEventListener("load", () => {
     const loader = document.getElementById("page-loader");
+    if (!loader) return;
     loader.style.display = "none"; // hide loader once everything is loaded
 });
 
@@ -805,7 +876,11 @@ window.toggleButtons = function (card) {
 
 document.addEventListener("DOMContentLoaded", () => {
     // Sales Chart (Line Chart)
-    const salesCtx = document.getElementById("salesChart").getContext("2d");
+    const salesCanvas = document.getElementById("salesChart");
+    const topCanvas = document.getElementById("topChart");
+    if (!window.Chart || !salesCanvas || !topCanvas) return;
+
+    const salesCtx = salesCanvas.getContext("2d");
     new Chart(salesCtx, {
         type: "line",
         data: {
@@ -841,7 +916,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Top Products Chart (Bar Chart)
-    const topCtx = document.getElementById("topChart").getContext("2d");
+    const topCtx = topCanvas.getContext("2d");
     new Chart(topCtx, {
         type: "bar",
         data: {
@@ -878,6 +953,7 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     const rangeSelect = document.getElementById("rangeSelect");
     const customWrapper = document.getElementById("customDateWrapper");
+    if (!rangeSelect || !customWrapper) return;
 
     function toggleCustomDates() {
         if (rangeSelect.value === "custom") {
@@ -896,6 +972,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("txFilterForm");
+    if (!form) return;
     form.querySelectorAll("input[type=date]").forEach(input => {
         input.addEventListener("change", () => {
             form.submit();
@@ -908,6 +985,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const customWrapper = document.getElementById('customDateWrapper');
     const startInput = document.getElementById('startDate');
     const endInput = document.getElementById('endDate');
+    if (!rangeSelect || !customWrapper || !startInput || !endInput) return;
 
     // Helper to get URL param
     const getParam = (k) => new URLSearchParams(window.location.search).get(k);

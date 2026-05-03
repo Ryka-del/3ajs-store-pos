@@ -34,6 +34,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link href='https://cdn.boxicons.com/fonts/basic/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
@@ -42,7 +43,7 @@ $result = $conn->query($sql);
 </head>
 
 <body id="page-transition"
-    class="flex bg-[#34495E] xl:min-h-screen md:max-h-screen translate-y-5 opacity-0 transition-all duration-500">
+    class="ui-app-shell flex bg-[#34495E] xl:min-h-screen md:max-h-screen translate-y-5 opacity-0 transition-all duration-500">
     <?php include 'includes/sidebar.php'; ?>
     <!-- Page Loader -->
     <div id="page-loader" class="fixed inset-0 flex items-center justify-center bg-white z-50">
@@ -50,7 +51,7 @@ $result = $conn->query($sql);
     </div>
 
     <!-- Full Page Wrapper -->
-    <div class="w-full p-0 m-6 overflow-hidden bg-gray-100 rounded-3xl">
+    <div class="ui-main-panel w-full p-0 m-6 overflow-hidden bg-gray-100 rounded-3xl">
         <!-- New div at the top of the full page wrapper -->
         <?php include 'includes/topbar.php'; ?>
 
@@ -62,14 +63,14 @@ $result = $conn->query($sql);
                 <!-- Category + Search -->
                 <div
                     class="flex flex-col sm:flex-row max-md:flex-col-reverse rounded-2xl justify-between sm:px-0 py-4 sm:py-2">
-                    <h3 class="xl:text-3xl sm:text-3xl max-md:text-2xl font-bold max-md:mt-4 text-start sm:mb-0">Choose
+                    <h3 class="section-heading reveal xl:text-3xl sm:text-3xl max-md:text-2xl font-bold max-md:mt-4 text-start sm:mb-0">Choose
                         Category</h3>
                     <form method="GET" class="relative w-full sm:w-72">
                         <i
                             class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-[#3498DB]"></i>
                         <input type="text" name="search" placeholder="Search..."
                             value="<?php echo htmlspecialchars($search); ?>"
-                            class="w-full p-2 pl-10 pr-10 rounded-lg text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            class="ui-input w-full p-2 pl-10 pr-10 rounded-lg text-black border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500">
                         <!--<button type="submit"
                             class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                             <i class="fa-solid fa-barcode absolute right-3 top-1/2 -translate-y-1/2 text-[#3498DB]"></i>
@@ -86,10 +87,10 @@ $result = $conn->query($sql);
 
                     <div id="categoriesRow" class="flex space-x-4 overflow-x-auto scroll-smooth py-2 scrollbar-hide">
                         <?php while ($row = $query->fetch_assoc()): ?>
-                            <div class="flex-shrink-0 cursor-pointer text-center p-4 bg-gray-100 rounded-2xl hover:bg-[#2980B9] transition min-w-[100px]"
+                            <div class="category-card tilt-card reveal flex-shrink-0 cursor-pointer text-center p-4 bg-gray-100 rounded-2xl hover:bg-[#2980B9] transition min-w-[100px]"
                                 onclick="filterProducts('<?php echo $row['id']; ?>')">
                                 <div
-                                    class="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow mx-auto">
+                                    class="category-card__icon w-12 h-12 flex items-center justify-center bg-white rounded-full shadow mx-auto">
                                     <i class='bx <?php echo $row['icon'] ?? "bx-grid"; ?> text-2xl text-[#3498DB]'></i>
                                 </div>
                                 <span class="mt-2 block font-medium text-gray-800 whitespace-nowrap">
@@ -107,7 +108,7 @@ $result = $conn->query($sql);
 
                 <!-- Gray Box -->
                 <div
-                    class="bg-gray-200 flex rounded-2xl flex items-start justify-start xl:h-[34rem] md:max-h-screen xl:h-screen text-gray-700 overflow-y-auto">
+                    class="ui-soft-card ui-glow-ring bg-gray-200 flex rounded-2xl flex items-start justify-start xl:h-[34rem] md:max-h-screen xl:h-screen text-gray-700 overflow-y-auto">
                     <div id="product-grid"
                         class="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-4 w-full p-4 md:mb-10 ">
                         <?php if ($result->num_rows > 0): ?>
@@ -116,7 +117,7 @@ $result = $conn->query($sql);
                                 $qty = (int) $product['quantity'];
                                 $is_oos = $qty <= 0;
                                 ?>
-                                <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg transition cursor-pointer flex flex-col <?php echo $is_oos ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''; ?>"
+                                <div class="product-card tilt-card reveal bg-white p-4 rounded-lg shadow hover:shadow-lg transition cursor-pointer flex flex-col <?php echo $is_oos ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''; ?>"
                                     <?php if (!$is_oos): ?> onclick="addToCart(
                                     '<?php echo $product['id']; ?>',
                                     '<?php echo htmlspecialchars($product['name']); ?>',
@@ -125,7 +126,7 @@ $result = $conn->query($sql);
                                     )" <?php endif; ?>>
                                     <img src="<?php echo htmlspecialchars($product['image_url']); ?>"
                                         alt="<?php echo htmlspecialchars($product['name']); ?>"
-                                        class="w-full h-32 object-cover rounded-lg mb-4">
+                                        class="product-thumb w-full h-32 object-cover rounded-lg mb-4">
                                     <h4 class="text-lg font-semibold mb-2 "><?php echo htmlspecialchars($product['name']); ?>
                                     </h4>
                                     <div class="mt-auto flex items-center justify-between pt-2">
@@ -150,7 +151,7 @@ $result = $conn->query($sql);
 
             <!-- Right Section -->
             <div
-                class="bg-gray-200 w-full md:w-1/3 md:max-h-screen mt-3 mr-3 mb-3 rounded-3xl p-4 flex flex-col xl:max-h-screen">
+                class="ui-cart-panel reveal bg-gray-200 w-full md:w-1/3 md:max-h-screen mt-3 mr-3 mb-3 rounded-3xl p-4 flex flex-col xl:max-h-screen">
                 <!-- flex-col + fixed height for scrollable content -->
 
                 <!-- Header -->
@@ -162,10 +163,10 @@ $result = $conn->query($sql);
                         </p>
                     </div>
                     <div class="text-right">
-                        <button type="button" onclick="openScanModal()">
+                        <button type="button" onclick="openScanModal()" class="tilt-card">
                             <i class='bx bx-barcode text-xl text-blue-500 border-1 p-4 rounded-lg shadow-md'></i>
                         </button>
-                        <button type="button" onclick="clearCart()">
+                        <button type="button" onclick="clearCart()" class="tilt-card">
                             <i class='bx bx-trash text-xl text-red-500 border-1 p-4 rounded-lg shadow-md'></i>
                         </button>
                     </div>
@@ -175,7 +176,7 @@ $result = $conn->query($sql);
                 <!-- Scan Modal -->
                 <div id="scanModal"
                     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50">
-                    <div class="bg-white rounded-3xl shadow-2xl w-[28rem] max-w-[90vw] p-6">
+                    <div class="ui-modal-panel reveal bg-white rounded-3xl shadow-2xl w-[28rem] max-w-[90vw] p-6">
                         <div class="flex items-center justify-between mb-3">
                             <h2 class="text-xl font-bold">Scan Barcode</h2>
                             <button onclick="closeScanModal()" class="text-gray-500 hover:text-black">✖</button>
@@ -210,7 +211,7 @@ $result = $conn->query($sql);
 
                     <!-- Checkout Button -->
                     <button type="button" onclick="openCheckoutModal()"
-                        class="w-full bg-[#3498DB] hover:bg-[#2980B9] text-white font-bold py-2 px-4 rounded-2xl shadow-md transition duration-200">
+                        class="ui-primary-btn w-full bg-[#3498DB] hover:bg-[#2980B9] text-white font-bold py-2 px-4 rounded-2xl shadow-md transition duration-200">
                         Checkout
                     </button>
                 </div>
@@ -218,7 +219,7 @@ $result = $conn->query($sql);
                 <div id="checkoutModal"
                     class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center hidden z-50">
                     <div
-                        class="bg-white rounded-3xl shadow-2xl w-96 p-6 transform transition-all duration-300 scale-95">
+                        class="ui-modal-panel reveal bg-white rounded-3xl shadow-2xl w-96 p-6 transform transition-all duration-300 scale-95">
                         <!-- Header -->
                         <h2 class="text-2xl font-bold text-gray-800 mb-2 text-center">Checkout</h2>
                         <p class="text-gray-500 text-center mb-6">Enter the payment amount for the items</p>
@@ -233,14 +234,14 @@ $result = $conn->query($sql);
                         <label for="paymentType" class="block text-sm font-medium text-gray-700 mb-1">Payment
                             Type</label>
                         <select id="paymentType"
-                            class="w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent text-gray-800">
+                            class="ui-select w-full border border-gray-300 rounded-xl p-3 mb-4 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent text-gray-800">
                             <option value="pay">Pay Now</option>
                             <option value="debt">Debt (Record without payment)</option>
                         </select>
 
                         <!-- Payment Input -->
                         <input id="paymentInput" type="number" placeholder="Enter amount"
-                            class="w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent text-gray-800 text-lg">
+                            class="ui-input w-full border border-gray-300 rounded-xl p-3 mb-6 focus:outline-none focus:ring-2 focus:ring-purple-400 focus:border-transparent text-gray-800 text-lg">
 
                         <!-- Change Display -->
                         <div class="flex justify-between items-center bg-gray-50 p-3 rounded-xl mb-6">
@@ -254,7 +255,7 @@ $result = $conn->query($sql);
                             <button type="button" onclick="closeCheckoutModal()"
                                 class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold px-5 py-2 rounded-xl transition duration-200">Cancel</button>
                             <button type="button" onclick="payNow()"
-                                class="bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white font-bold px-5 py-2 rounded-xl shadow-lg transition duration-200">Pay</button>
+                                class="ui-accent-btn bg-gradient-to-r from-purple-400 to-purple-600 hover:from-purple-500 hover:to-purple-700 text-white font-bold px-5 py-2 rounded-xl shadow-lg transition duration-200">Pay</button>
                         </div>
                     </div>
                 </div>

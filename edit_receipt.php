@@ -6,10 +6,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $amount = floatval($_POST['amount']);
     $payment_type = $_POST['payment_type'] ?? 'debt';
 
-    // Update query
-    $query = "UPDATE orders SET payment_amount = ?, payment_type = ? WHERE id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("dsi", $amount, $payment_type, $order_id);
+    $paymentTypeColumn = $conn->query("SHOW COLUMNS FROM orders LIKE 'payment_type'");
+    $hasPaymentType = $paymentTypeColumn && $paymentTypeColumn->num_rows > 0;
+
+    if ($hasPaymentType) {
+        $query = "UPDATE orders SET payment_amount = ?, payment_type = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("dsi", $amount, $payment_type, $order_id);
+    } else {
+        $query = "UPDATE orders SET payment_amount = ? WHERE id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("di", $amount, $order_id);
+    }
 
     if ($stmt->execute()) {
         // Preserve filter parameters

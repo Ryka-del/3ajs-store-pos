@@ -185,20 +185,21 @@ function range_label($r)
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Dashboard</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-    <script src="script.js"></script>
+    <script src="assets/js/script.js"></script>
 </head>
 
 <body id="page-transition"
-    class="flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500 text-sm text-gray-500">
+    class="ui-app-shell flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500 text-sm text-gray-500">
     <?php include 'includes/sidebar.php'; ?>
     <!-- Container -->
-    <div class="bg-gray-100 m-6 w-full min-h-screen p-6 space-y-6 rounded-3xl">
+    <div class="ui-main-panel bg-gray-100 m-6 w-full min-h-screen p-6 space-y-6 rounded-3xl">
         <?php include 'includes/topbar.php'; ?>
-        <h2 class="font-bold text-2xl">Dashboard</h2>
+        <h2 class="section-heading reveal font-bold text-2xl">Dashboard</h2>
         <!-- Sales Overview Header -->
         <section class="flex items-center justify-between space-y-3">
             <div>
@@ -206,9 +207,9 @@ function range_label($r)
                 <p class="text-gray-500 text-sm">Your current sales summary and activity</p>
             </div>
             <!-- Right: Controls (pure PHP via form) -->
-            <form method="GET" class="flex flex-wrap justify-end items-center gap-2">
+            <form method="GET" class="ui-filter-shell reveal flex flex-wrap justify-end items-center gap-2 rounded-2xl px-3 py-3">
                 <select name="range" id="rangeSelect"
-                    class="border border-gray-300 rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                    class="ui-select border border-gray-300 rounded-full px-4 py-2 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     <option value="today" <?php echo $range === 'today' ? 'selected' : ''; ?>>Today</option>
                     <option value="7d" <?php echo $range === '7d' ? 'selected' : ''; ?>>Last 7 Days</option>
                     <option value="month" <?php echo $range === 'month' ? 'selected' : ''; ?>>This Month</option>
@@ -223,17 +224,17 @@ function range_label($r)
                         <label for="startDate" class="text-xs font-medium text-gray-600">Start</label>
                         <input type="date" name="start" id="startDate"
                             value="<?php echo isset($_GET['start']) ? $_GET['start'] : ''; ?>"
-                            class="border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            class="ui-input border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     </div>
                     <div class="flex flex-col">
                         <label for="endDate" class="text-xs font-medium text-gray-600">End</label>
                         <input type="date" name="end" id="endDate"
                             value="<?php echo isset($_GET['end']) ? $_GET['end'] : ''; ?>"
-                            class="border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
+                            class="ui-input border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-purple-500 focus:outline-none">
                     </div>
                 </div>
                 <button type="submit"
-                    class="bg-purple-600 hover:bg-purple-700 text-white rounded-full px-4 py-2 text-sm flex items-center gap-1 shadow">
+                    class="ui-accent-btn bg-purple-600 hover:bg-purple-700 text-white rounded-full px-4 py-2 text-sm flex items-center gap-1 shadow">
                     <i class="bx bx-filter-alt text-lg"></i>
                     <span>Filter</span>
 
@@ -249,7 +250,7 @@ function range_label($r)
         <!-- Sales Summary Cards -->
         <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <!-- Total Sales -->
-            <div class="bg-purple-600 rounded-xl p-6 text-white flex justify-between items-center">
+            <div class="status-card tilt-card reveal bg-purple-600 rounded-xl p-6 text-white flex justify-between items-center">
                 <div>
                     <p class="text-sm opacity-70">Total Sales</p>
                     <h3 class="text-3xl font-bold mt-1">₱<?php echo number_format($revenue, 2); ?></h3>
@@ -261,7 +262,7 @@ function range_label($r)
             </div>
 
             <!-- Total Products -->
-            <div class="bg-white rounded-xl shadow p-6 flex justify-between items-center">
+            <div class="status-card tilt-card reveal bg-white rounded-xl shadow p-6 flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-600">Total Products</p>
                     <h3 class="text-3xl font-bold mt-1"><?php echo $total_products; ?></h3>
@@ -273,7 +274,7 @@ function range_label($r)
             </div>
 
             <!-- Total Transactions -->
-            <div class="bg-white rounded-xl shadow p-6 flex justify-between items-center">
+            <div class="status-card tilt-card reveal bg-white rounded-xl shadow p-6 flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-600">Total Transaction</p>
                     <h3 class="text-3xl font-bold mt-1"><?php echo $transactions; ?></h3>
@@ -285,7 +286,7 @@ function range_label($r)
             </div>
 
             <!-- Profit Overview -->
-            <div class="bg-white rounded-xl shadow p-6 flex justify-between items-center">
+            <div class="status-card tilt-card reveal bg-white rounded-xl shadow p-6 flex justify-between items-center">
                 <div>
                     <p class="text-sm text-gray-600">Profit Overview</p>
                     <h3 class="text-3xl font-bold mt-1">₱<?php echo number_format($profit, 2); ?></h3>
@@ -300,11 +301,11 @@ function range_label($r)
 
             <!-- Charts Section -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div class="flex flex-col items-center bg-white shadow rounded-xl p-4 h-64">
+                <div class="ui-chart-card tilt-card reveal flex flex-col items-center bg-white shadow rounded-xl p-4 h-64">
                     <p class="text-lg"><i class='bx bx-chart-spline text-purple-500'></i> Sales Chart</p>
                     <canvas id="salesChart" class="w-full h-full mb-4"></canvas>
                 </div>
-                <div class="flex flex-col items-center bg-white shadow rounded-xl p-4 h-64">
+                <div class="ui-chart-card tilt-card reveal flex flex-col items-center bg-white shadow rounded-xl p-4 h-64">
                     <p class="text-lg"><i class='bx  bx-bar-chart-big text-purple-500 text-1xl'></i> Top-Selling
                         Products</p>
                     <canvas id="topChart" class="w-full h-full mb-4"></canvas>
@@ -312,7 +313,7 @@ function range_label($r)
             </div>
 
             <!-- Low Stock Products -->
-            <div class="bg-white shadow rounded-xl p-4 mb-6">
+            <div class="ui-table-card reveal bg-white shadow rounded-xl p-4 mb-6">
                 <div class="flex items-center justify-between">
                     <h2 class="text-lg font-bold mb-2">⚠️ Low Stock Products</h2>
                     <div class="flex items-center">
@@ -358,20 +359,20 @@ function range_label($r)
             </div>
 
             <!-- Recent Transactions (PHP) -->
-            <div class="bg-white shadow rounded-xl p-4">
+            <div class="ui-table-card reveal bg-white shadow rounded-xl p-4">
                 <div class="flex items-center justify-between ">
                     <h2 class="text-lg font-bold mb-2">🧾 Recent Transactions</h2>
                     <div class="flex items-center gap-4 ">
                         <form method="GET" id="txFilterForm" class="flex items-center gap-2">
                             <input type="date" name="tx_start"
                                 value="<?php echo isset($_GET['tx_start']) ? $_GET['tx_start'] : ''; ?>"
-                                class="border rounded-full px-3 py-1 text-sm">
+                                class="ui-input border rounded-full px-3 py-1 text-sm">
 
                             <span>to</span>
 
                             <input type="date" name="tx_end"
                                 value="<?php echo isset($_GET['tx_end']) ? $_GET['tx_end'] : ''; ?>"
-                                class="border rounded-full px-3 py-1 text-sm">
+                                class="ui-input border rounded-full px-3 py-1 text-sm">
                         </form>
                         <a href="transaction.php"
                             class="flex items-center gap-2 rounded-full border px-4 py-2 hover:bg-gray-200">

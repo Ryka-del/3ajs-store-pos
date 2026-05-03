@@ -19,6 +19,9 @@ $start = $_GET['start'] ?? null;
 $end = $_GET['end'] ?? null;
 
 $where = "1"; // default (always true)
+$paymentTypeColumn = mysqli_query($conn, "SHOW COLUMNS FROM orders LIKE 'payment_type'");
+$hasPaymentType = $paymentTypeColumn && mysqli_num_rows($paymentTypeColumn) > 0;
+$paymentTypeSelect = $hasPaymentType ? "o.payment_type" : "'pay' AS payment_type";
 
 switch ($range) {
     case 'today':
@@ -53,7 +56,7 @@ $query = "SELECT
             o.user_id, 
             o.total_amount, 
             o.payment_amount,
-            o.payment_type, 
+            $paymentTypeSelect, 
             DATE_FORMAT(o.created_at, '%M %d, %Y %h:%i %p') AS formatted_date,
             oi.quantity, 
             oi.price AS item_price, 
@@ -95,19 +98,20 @@ if ($result && mysqli_num_rows($result) > 0) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Transaction History</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body id="page-transition"
-    class="flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500">
+    class="ui-app-shell flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500">
 
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
     <div class="flex-1">
         
     </div>
-    <div class="bg-gray-100 m-6 w-full p-4 space-y-4 rounded-2xl">
+    <div class="ui-main-panel bg-gray-100 m-6 w-full p-4 space-y-4 rounded-2xl">
         <?php include __DIR__ . '/includes/topbar.php'; ?>
-        <h1 class="max-lg:text-2xl xl:text-4xl font-bold text-gray-800 mb-4">Transaction History</h1>
+        <h1 class="section-heading reveal max-lg:text-2xl xl:text-4xl font-bold text-gray-800 mb-4">Transaction History</h1>
         <div class="flex justify-between items-center">
             <div class="">
                 <h2 class="text-2xl font-semibold mb-2">All Transactions</h2>
@@ -117,7 +121,7 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <!-- Left side: range filter -->
                 <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full max-w-lg">
                     <select name="range" id="rangeSelect"
-                        class="border border-gray-300 rounded-full px-4 py-2 text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        class="ui-select border border-gray-300 rounded-full px-4 py-2 text-sm bg-white shadow-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
                         <option value="today" <?php echo $range === 'today' ? 'selected' : ''; ?>>Today</option>
                         <option value="7d" <?php echo $range === '7d' ? 'selected' : ''; ?>>Last 7 Days</option>
                         <option value="month" <?php echo $range === 'month' ? 'selected' : ''; ?>>This Month</option>
@@ -132,30 +136,30 @@ if ($result && mysqli_num_rows($result) > 0) {
                             <label for="startDate" class="text-xs font-medium text-gray-600">Start</label>
                             <input type="date" name="start" id="startDate"
                                 value="<?php echo isset($_GET['start']) ? $_GET['start'] : ''; ?>"
-                                class="border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                class="ui-input border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                         <div class="flex flex-col">
                             <label for="endDate" class="text-xs font-medium text-gray-600">End</label>
                             <input type="date" name="end" id="endDate"
                                 value="<?php echo isset($_GET['end']) ? $_GET['end'] : ''; ?>"
-                                class="border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                                class="ui-input border border-gray-300 rounded-lg px-2 py-1 text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
                         </div>
                     </div>
                 </div>
 
                 <!-- Right side: print button -->
                 <button onclick="window.print()"
-                    class="bg-purple-600 hover:bg-purple-700 text-white px-2 py-2 rounded-full shadow-md text-sm font-medium transition w-full">
+                    class="ui-accent-btn bg-purple-600 hover:bg-purple-700 text-white px-2 py-2 rounded-full shadow-md text-sm font-medium transition w-full">
                     🖨️ Print Transactions
                 </button>
             </div>
         </div>
-        <div class="bg-gray-300 p-6 rounded-3xl h-[calc(100vh-200px)]  overflow-y-auto">
+        <div class="ui-soft-card ui-glow-ring bg-gray-300 p-6 rounded-3xl h-[calc(100vh-200px)]  overflow-y-auto">
             <?php if (!empty($orders)): ?>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 ">
                     <?php foreach ($orders as $id => $order): ?>
                         <div
-                            class="relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-transform transform group overflow-hidden hover:-translate-y-2 border border-gray-100 p-4 pb-12">
+                            class="ui-soft-card tilt-card reveal relative bg-white rounded-2xl shadow-sm hover:shadow-xl transition-transform transform group overflow-hidden hover:-translate-y-2 border border-gray-100 p-4 pb-12">
 
                             <!-- Header -->
                             <div class="flex items-center justify-between mb-3">
@@ -256,8 +260,8 @@ if ($result && mysqli_num_rows($result) > 0) {
         </div>
     </div>
     <!-- Modal (hidden by default) -->
-    <div id="editModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 duration-300"
+        <div id="editModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+        <div class="ui-modal-panel bg-white w-full max-w-lg rounded-2xl shadow-2xl transform transition-all scale-95 opacity-0 duration-300"
             id="editModalContent">
 
             <!-- Header -->
@@ -283,14 +287,14 @@ if ($result && mysqli_num_rows($result) > 0) {
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">Paid Amount (₱)</label>
                     <input type="number" step="0.01" name="amount" id="editAmount"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
+                        class="ui-input w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition">
                 </div>
 
                 <!-- Payment Type -->
                 <div>
                     <label class="block text-sm font-medium text-gray-600 mb-1">Payment Type</label>
                     <select name="payment_type" id="editPaymentType"
-                        class="w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
+                        class="ui-select w-full border border-gray-300 rounded-xl px-4 py-2.5 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition"
                         required>
                         <option value="pay">✅ Fully Paid</option>
                         <option value="debt">⏳ Debt</option>

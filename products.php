@@ -158,6 +158,7 @@ if (isset($_GET['barcode'])) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product</title>
+    <link rel="stylesheet" href="assets/css/style.css">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -169,11 +170,11 @@ if (isset($_GET['barcode'])) {
 </head>
 
 <body id="page-transition"
-    class="flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500">
+    class="ui-app-shell flex bg-[#34495E] font-sans text-gray-900 translate-y-5 opacity-0 transition-all duration-500">
     <?php include 'includes/sidebar.php'; ?>
-    <div class="bg-gray-100 m-6 w-full min-h-screen p-6 space-y-6 rounded-3xl">
+    <div class="ui-main-panel bg-gray-100 m-6 w-full min-h-screen p-6 space-y-6 rounded-3xl">
         <?php include 'includes/topbar.php'; ?>
-        <h2 class="text-4xl font-bold text-gray-800 mb-4">Products</h2>
+        <h2 class="section-heading reveal text-4xl font-bold text-gray-800 mb-4">Products</h2>
 
         <!-- <div class="">
             <?php if ($low > 0): ?>
@@ -194,7 +195,7 @@ if (isset($_GET['barcode'])) {
                 <div class="relative w-full">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-blue-500"></i>
                     <input type="text" name="search" placeholder="Search product..."
-                        class="w-full p-2 pl-10 rounded-l-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 text-black rounded-lg"
+                        class="ui-input w-full p-2 pl-10 rounded-l-lg border border-gray-300 focus:ring-2 focus:ring-blue-500 text-black rounded-lg"
                         value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
                     <button class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700">
                         <i class="fa-solid fa-barcode absolute right-3 top-1/2 -translate-y-1/2 text-blue-500"></i>
@@ -206,7 +207,7 @@ if (isset($_GET['barcode'])) {
                 <!-- Category Filter -->
                 <form method="GET">
                     <select name="category" onchange="this.form.submit()"
-                        class="p-2 rounded-lg border border-gray-300 text-black">
+                        class="ui-select p-2 rounded-lg border border-gray-300 text-black">
                         <option value="">All Categories</option>
                         <!-- Loop categories dynamically -->
                         <?php
@@ -222,7 +223,7 @@ if (isset($_GET['barcode'])) {
                 </form>
 
                 <!-- Add Product Button -->
-                <button class="bg-blue-600 hover:bg-blue-700 text-white xl:px-4 xl:py-2 rounded-lg"
+                <button class="ui-primary-btn bg-blue-600 hover:bg-blue-700 text-white xl:px-4 xl:py-2 rounded-lg"
                     onclick="openProductModal('add')">
                     + Add Product
                 </button>
@@ -230,7 +231,7 @@ if (isset($_GET['barcode'])) {
             <!-- Modal -->
             <div id="addProductModal"
                 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-                <div class="bg-white rounded-xl p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
+                <div class="ui-modal-panel bg-white rounded-xl p-6 w-full max-w-lg relative max-h-[90vh] overflow-y-auto">
                     <h2 id="productModalTitle" class="text-xl font-bold mb-4">Add Product</h2>
 
                     <!-- Close Button -->
@@ -261,7 +262,7 @@ if (isset($_GET['barcode'])) {
                             <label class="block text-sm font-medium text-gray-700">Barcode</label>
                             <div class="flex space-x-2">
                                 <input type="text" id="barcodeInput" name="barcode"
-                                    class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                                    class="ui-input w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
                                     placeholder="Scan or enter barcode">
                                 <button type="button" onclick="startScanner()"
                                     class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg">
@@ -273,14 +274,14 @@ if (isset($_GET['barcode'])) {
                         <!-- Product Name -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Product Name</label>
-                            <input type="text" id="productName" name="name" class="w-full p-2 border rounded-lg"
+                            <input type="text" id="productName" name="name" class="ui-input w-full p-2 border rounded-lg"
                                 required>
                         </div>
 
                         <!-- Category -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Category</label>
-                            <select id="categorySelect" name="category" class="w-full p-2 border rounded-lg" required>
+                            <select id="categorySelect" name="category" class="ui-select w-full p-2 border rounded-lg" required>
                                 <option value="" disabled selected>Select Category</option>
                                 <?php
                                 $cats = $conn->query("SELECT * FROM categories");
@@ -296,13 +297,13 @@ if (isset($_GET['barcode'])) {
                             <!-- Cost Price -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Cost Price</label>
-                                <input type="number" step="0.01" name="cost_price" id="costPrice" class="w-full p-2 border rounded-lg"
+                                <input type="number" step="0.01" name="cost_price" id="costPrice" class="ui-input w-full p-2 border rounded-lg"
                                     required>
                             </div>
                             <!-- Price -->
                             <div>
                                 <label class="block text-sm font-medium text-gray-700">Price</label>
-                                <input type="number" step="0.01" name="price" id="sellPrice" class="w-full p-2 border rounded-lg"
+                                <input type="number" step="0.01" name="price" id="sellPrice" class="ui-input w-full p-2 border rounded-lg"
                                     required>
                             </div>
                         </div>
@@ -310,12 +311,12 @@ if (isset($_GET['barcode'])) {
                         <!-- Quantity -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700">Quantity</label>
-                            <input type="number" name="quantity" id="qty" class="w-full p-2 border rounded-lg" required>
+                            <input type="number" name="quantity" id="qty" class="ui-input w-full p-2 border rounded-lg" required>
                         </div>
 
                         <!-- Submit -->
                         <button id="productSubmitBtn" type="submit"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full">
+                            class="ui-primary-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg w-full">
                             Save Product
                         </button>
                     </form>
@@ -336,16 +337,16 @@ if (isset($_GET['barcode'])) {
         </div>
         <!-- Products Grid -->
         <div
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 border p-4 rounded-lg bg-white h-[42rem] overflow-y-auto">
+            class="ui-soft-card ui-glow-ring grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6 border p-4 rounded-lg bg-white h-[42rem] overflow-y-auto">
             <?php if ($query->num_rows > 0): ?>
                 <?php while ($row = $query->fetch_assoc()): ?>
                     <div class="flex flex-col">
-                        <div class="bg-white rounded-xl shadow-md p-4 flex flex-col items-center h-72 cursor-pointer hover:shadow-lg transition hover:-translate-y-2"
+                        <div class="product-card tilt-card reveal bg-white rounded-xl shadow-md p-4 flex flex-col items-center h-72 cursor-pointer hover:shadow-lg transition hover:-translate-y-2"
                             onclick="toggleButtons(this)">
                             <!-- Product Image -->
                             <img src="<?php echo !empty($row['image_url']) ? $row['image_url'] : 'assets/images/no-image.png'; ?>"
                                 alt="<?php echo htmlspecialchars($row['name']); ?>"
-                                class="w-32 h-32 object-cover rounded-lg mb-3">
+                                class="product-thumb w-32 h-32 object-cover rounded-lg mb-3">
 
                             <!-- Product Info -->
                             <h2 class="text-lg font-semibold text-gray-800">
@@ -365,7 +366,7 @@ if (isset($_GET['barcode'])) {
                         <!-- Buttons BELOW card -->
                         <div class="hidden flex justify-center mt-3 gap-3 action-buttons">
                             <button
-                                class="w-full px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
+                                class="ui-primary-btn w-full px-6 py-2 bg-blue-500 text-white rounded-lg shadow hover:bg-blue-600 transition"
                                 onclick="openProductModal('edit', this)"
                                 data-id="<?php echo (int)$row['id']; ?>"
                                 data-barcode="<?php echo htmlspecialchars($row['barcode']); ?>"
